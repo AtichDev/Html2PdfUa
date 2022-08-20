@@ -1,0 +1,23 @@
+@font-face {
+    font-family: 'Quicksand';
+    /* Note: No trailing format tag is allowed. */
+    /* Note: Fonts work only in .ttf format.  */
+    src: url(Quicksand-Regular.ttf);
+    font-weight: normal;
+    font-style: normal;
+}
+@page {
+    margin: 30px 20px;
+
+    @top-center {
+        font-family: 'Quicksand';
+        font-size: 16px;
+        color: blue;
+        content: "This is PDF/UA page " counter(page) " of " counter(pages) ".";
+    }
+}
+body {
+    margin: 0;
+    font-family: 'Quicksand';
+    font-size: 15px;
+}
