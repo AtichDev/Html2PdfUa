@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC
+        "-//OPENHTMLTOPDF//DOC XHTML Character Entities Only 1.0//EN" "">
+<html>
+<head>
+    <title>Hello Mustache PDF/UA Testcase</title>
+    <meta name="subject" content="Hello Mustache PDF/UA Testcase"/>
+    <meta name="description" content="A minimum example to create a PDF/UA file using Mustache in a HTML file."/>
+    <style>
+    @font-face {
+      font-family: 'Sora';
+      /* Note: No trailing format tag is allowed. */
+      /* Note: Fonts work only in .ttf format.  */
+      src: url(assets/Sora-Regular.ttf);
+      font-weight: normal;
+      font-style: normal;
+    }
+    body {
+      font-family: 'Sora';
+    }
+
+    </style>
+</head>
+<body>
+
+<h1>{{title}}</h1>
+
+{{#hasProducts}}
+<ul>
+    {{/hasProducts}}
+    {{#products}}
+    <li>{{name}}</li>
+    {{/products}}
+    {{#hasProducts}}
+</ul>
+{{/hasProducts}}
+
+</body>
+</html>

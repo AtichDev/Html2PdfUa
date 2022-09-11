@@ -1,9 +1,18 @@
 package com.atichdev;
 
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
+import com.google.gson.Gson;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.openhtmltopdf.util.XRLog;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 public class ConvertJobProcess {
@@ -35,7 +44,21 @@ public class ConvertJobProcess {
         if (fos == null) {
             return false;
         }
-        if (!this.writePdf(job.htmlPath, fos)) {
+        File htmlFile = new File(job.htmlPath);
+        String baseUri = Paths.get(htmlFile.getAbsolutePath()).toUri().toString();
+        String htmlContent = this.readFileContent(htmlFile);
+        if (htmlContent == null) {
+            this.closeFOS(fos, job.pdfPath);
+            return false;
+        }
+        if (job.mustachePath != null) {
+            htmlContent = this.parseMustacheTemplate(job.mustachePath, htmlContent);
+            if (htmlContent == null) {
+                this.closeFOS(fos, job.pdfPath);
+                return false;
+            }
+        }
+        if (!this.writePdf(htmlContent, baseUri, fos)) {
             this.closeFOS(fos, job.pdfPath);
             return false;
         }
@@ -52,8 +75,47 @@ public class ConvertJobProcess {
         return null;
     }
 
-    private boolean writePdf(String htmlPath, FileOutputStream fos) {
-        this.builder.withFile(new File(htmlPath));
+    private String readFileContent(File file) {
+        try {
+            return FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            this.errorMsg = "File " + file.getPath() + " could not be read.";
+            this.exception = e;
+        }
+        return null;
+    }
+
+    private String parseMustacheTemplate(String jsonPath, String mustacheTemplate) {
+        String jsonContent = this.readFileContent(new File(jsonPath));
+        if (jsonContent == null) {
+            return null;
+        }
+        Map<String, Object> gsonMap = new HashMap<String, Object>();
+        try {
+            Gson gson = new Gson();
+            gsonMap = (Map<String, Object>) gson.fromJson(jsonContent, gsonMap.getClass());
+        } catch (Exception e) {
+            this.errorMsg = "Json content could not be parsed.";
+            this.exception = e;
+            return null;
+        }
+
+        try {
+            MustacheFactory mf = new DefaultMustacheFactory();
+            Mustache mustache = mf.compile(new StringReader(mustacheTemplate), "template");
+            StringWriter htmlWriter = new StringWriter();
+            mustache.execute(htmlWriter, gsonMap);
+            return htmlWriter.toString();
+        } catch (Exception e) {
+            this.errorMsg = "Mustache template could not be compiled.";
+            this.exception = e;
+        }
+        return null;
+    }
+
+    private boolean writePdf(String htmlContent, String baseUri, FileOutputStream fos) {
+//        this.builder.withFile(new File(htmlPath));
+        this.builder.withHtmlContent(htmlContent, baseUri);
         this.builder.toStream(fos);
         try {
             this.builder.run();

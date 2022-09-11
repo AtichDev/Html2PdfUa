@@ -23,6 +23,21 @@ Append multiple mappings in quotes as arguments. Example
 ```
 java -jar html2pdfua.jar "path/to/your-1.html > path/to/output-1.pdf" "path/to/your-2.html > path/to/output-2.pdf" ...
 ```
+
+### Reuse templates
+
+Most of the time we want to generate the same document with different values. 
+You can do this by creating the html templates in a programming language of your choice.
+
+Alternatively you can use mustache templates in your HTML. 
+Put the data needed for the templates in an additional .json file and generate the pdf as follows
+
+```
+java -jar html2pdfua.jar "path/to/your/data.json > path/to/your/mustache/template.html > path/to/your/output.pdf"
+```
+
+
+[mutache template](https://mustache.github.io/)
 ## Guidelines
 + Use the template from the examples.
 + Use a clean xml syntax. For example `<br/>` instead of `<br>`

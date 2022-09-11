@@ -1,0 +1,18 @@
+{
+  "title": "cars",
+  "hasProducts": true,
+  "products": [
+    {
+      "name": "Toyota"
+    },
+    {
+      "name": "Volkswagen"
+    },
+    {
+      "name": "Hyundai"
+    },
+    {
+      "name": "General Motors"
+    }
+  ]
+}
